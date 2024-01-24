@@ -1,4 +1,3 @@
-const sha256 = require("js-sha256");
 const BigInt = require("big-integer");
 
 const EcdsaMath = require("./math");
@@ -7,13 +6,16 @@ const BinaryAscii = require("./utils/binary");
 const Integer = require("./utils/integer");
 const randomInteger = Integer.between;
 const modulo = Integer.modulo;
+import * as Crypto from 'expo-crypto';
 
 
 exports.sign = async function (message, privateKey, hashfunc = null, randNum = null) {
     if (hashfunc == null) {
-        hashfunc = sha256;
+      hashfunc = async (message) => {
+        return await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, message);
+      };
     }
-    let hashMessage = hashfunc(message);
+    let hashMessage = await hashfunc(message);
     let numberMessage = BinaryAscii.numberFromHex(hashMessage);
     let curve = privateKey.curve;
     if (randNum == null) {
@@ -26,8 +28,13 @@ exports.sign = async function (message, privateKey, hashfunc = null, randNum = n
 };
 
 
-exports.verify = function (message, signature, publicKey, hashfunc=sha256) {
-    let hashMessage = hashfunc(message);
+exports.verify = async function (message, signature, publicKey, hashfunc = null) {
+    if (hashfunc == null) {
+      hashfunc = async (message) => {
+        return await Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, message);
+      };
+    }
+    let hashMessage = await hashfunc(message);
     let numberMessage = BinaryAscii.numberFromHex(hashMessage);
     let curve = publicKey.curve;
     let sigR = signature.r;

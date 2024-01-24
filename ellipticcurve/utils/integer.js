@@ -1,7 +1,7 @@
 // based on random-number-csprng: https://www.npmjs.com/package/random-number-csprng
 
 const BigInt = require("big-integer");
-import * as Random from 'expo-random';
+import * as Crypto from 'expo-crypto';
 
 
 
@@ -49,7 +49,7 @@ function calculateParameters(range) {
 
 
 async function secureRandomNumber(minimum, maximum) { // bigint, bigint
-    
+
     if (maximum.lesserOrEquals(minimum)) {
         throw new Error("The maximum value must be higher than the minimum value.")
     };
@@ -66,7 +66,7 @@ async function secureRandomNumber(minimum, maximum) { // bigint, bigint
 
     let {bitsNeeded, bytesNeeded, mask} = calculateParameters(range);
 
-    let randomBytes = await Random.getRandomBytesAsync(bytesNeeded);
+    let randomBytes = await Crypto.getRandomBytesAsync(bytesNeeded);
 
     var randomValue = BigInt(0);
 
